@@ -53,15 +53,16 @@ const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 
 app.use(cors({
   origin: CLIENT_ORIGIN,
+  methods: ['GET', 'POST'],
   credentials: true
 }));
 app.use(express.json());
 
-mongoose
-  .connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB error", err));
 
+// ✅ Setup Socket.IO with CORS config
 const io = new Server(server, {
   cors: {
     origin: CLIENT_ORIGIN,
@@ -70,8 +71,9 @@ const io = new Server(server, {
   }
 });
 
+// ✅ Initialize sockets
 leaderboardSocket(io);
 
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
