@@ -48,36 +48,30 @@ const leaderboardSocket = require("./sockets/leaderboardSocket");
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Use your exact deployed frontend URL
-const CLIENT_ORIGIN = "https://real-time-leaderboard-frontend.vercel.app";
 const PORT = process.env.PORT || 3000;
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 
-// ✅ CORS config
-const corsOptions = {
+app.use(cors({
   origin: CLIENT_ORIGIN,
-  methods: ['GET', 'POST'],
-  credentials: true,
-};
-
-// ✅ Allow frontend to access REST APIs
-app.use(cors(corsOptions));
+  credentials: true
+}));
 app.use(express.json());
 
-// ✅ Allow frontend to connect via socket.io
-const io = new Server(server, {
-  cors: corsOptions,
-});
-
-// ✅ Connect MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB connection failed", err));
+  .catch((err) => console.error("❌ MongoDB error", err));
 
-// ✅ Setup socket events
+const io = new Server(server, {
+  cors: {
+    origin: CLIENT_ORIGIN,
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
+
 leaderboardSocket(io);
 
-// ✅ Start the server
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
