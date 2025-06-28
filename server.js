@@ -51,32 +51,39 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 
-// ✅ Unified CORS options
+// ✅ CORS Options
 const corsOptions = {
   origin: CLIENT_ORIGIN,
   methods: ["GET", "POST"],
   credentials: true,
 };
 
-// ✅ Apply CORS to HTTP requests
+// ✅ Apply CORS to HTTP routes
 app.use(cors(corsOptions));
-
-// ✅ Middleware for parsing JSON
 app.use(express.json());
 
-// ✅ Connect to MongoDB
+// ✅ MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Setup socket.io with CORS
+// ✅ Socket.io with proper CORS
 const io = new Server(server, {
-  cors: corsOptions,
+  cors: {
+    origin: CLIENT_ORIGIN,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
 
-// ✅ Handle leaderboard socket logic
+// ✅ Leaderboard socket logic
 leaderboardSocket(io);
+
+// ✅ Health check route (optional but useful)
+app.get("/", (req, res) => {
+  res.send("Server is running ✅");
+});
 
 // ✅ Start server
 server.listen(PORT, () => {
