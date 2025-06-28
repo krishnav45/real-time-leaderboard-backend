@@ -62,7 +62,6 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB error", err));
 
-// ✅ Setup Socket.IO with CORS config
 const io = new Server(server, {
   cors: {
     origin: CLIENT_ORIGIN,
@@ -71,9 +70,9 @@ const io = new Server(server, {
   }
 });
 
-// ✅ Initialize sockets
 leaderboardSocket(io);
 
-server.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+// ✅ Required for Render
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
 });
