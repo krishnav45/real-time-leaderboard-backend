@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const { Server } = require("socket.io");
 const leaderboardSocket = require("./sockets/leaderboardSocket");
+const seedPlayers = require("./utils/autoSeed");
+
 
 const app = express();
 const server = http.createServer(app);
@@ -20,7 +22,10 @@ app.use(cors({
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
+  .then(async () => {
+    console.log("✅ MongoDB connected");
+    await seedPlayers(); // ✅ Auto seeding
+  })
   .catch((err) => console.error("❌ MongoDB error", err));
 
 const io = new Server(server, {
